@@ -27,11 +27,13 @@ mongoose.connect(MongoDbURI)
 app.use(Express.json())
 app.use(Express.urlencoded({extended: true}))
 app.use(cors({
-    origin: [`http://localhost:3000`, `https://asdstudio.vercel.app`, `http://192.168.0.110:3000`, `http://192.168.0.34:5500`],
+    origin: [`http://localhost:3000`, `https://asdstudio.vercel.app`, `http://192.168.0.110:3000`, `http://192.168.0.34:5500`, `http://192.168.0.31:3000`],
     credentials: true
 }))
 
 app.use('/uploads', Express.static('uploads')); 
+
+app.set("trust proxy", 1);
 
 const Store = new MongoDbSession({
     uri: MongoDbURI,
@@ -41,9 +43,21 @@ const Store = new MongoDbSession({
 app.use(Session({
     secret: 'SKkey',
     saveUninitialized: false,
-    resave: false,
-    store: Store
+    resave: true,
+    store: Store,
+    cookie: {
+        secure: true,
+        httpOnly: true,
+        sameSite: 'none'
+    }
 }))
+
+app.use((req, res, next) => {
+    console.log("Session Data:", req.session);
+    next();
+});
+
+
 
 app.use(AuthRouter)
 app.use(BookingRouter)

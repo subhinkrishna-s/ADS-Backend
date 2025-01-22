@@ -32,8 +32,6 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log("Body:",req.body)
-
     if(!email || !password){
       return res.send({success: false, message: "Please provide all details!"})
     }
@@ -45,7 +43,14 @@ router.post("/login", async (req, res) => {
 
     req.session.user = { id: user.id, email: user.email, role: user.role };
 
-    return res.send({ success: true, message: "Logged in successful!" });
+    req.session.save((err) => {
+      if (err) {
+          console.log("Session save error:", err);
+          return res.send({ success: false, message: "Session save failed" });
+      }
+      return res.send({ success: true, message: "Logged in successful!" });
+  })
+
   } catch (err) {
     console.log("Error in Login:",err)
     return res.send({ success: false, message: "Tourble in Login, Please contact developer!" });
@@ -71,6 +76,7 @@ router.get("/logout", isAuth, (req, res) => {
 // API for fetching session user (Check if logged in)
 router.get("/fetch-authuser", isAuth, (req, res) => {
     try{
+      console.log('session data:',req.session)
         if (req.session.user) {
             return res.send({ success: true, message: "Successfully fetched the current auth User!", user: req.session.user });
         } else {

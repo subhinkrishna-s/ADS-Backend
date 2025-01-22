@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // API for adding a new product (with image upload)
-router.post("/add-product", isAdmin, upload.fields([{ name: "coverPhoto" }, { name: "framePhoto" }]), async (req, res) => {
+router.post("/add-product", upload.fields([{ name: "coverPhoto" }, { name: "framePhoto" }]), async (req, res) => {
   try {
     let { name, availableSizes, price, isAvailable } = req.body;
     console.log("req:",req.body)
@@ -106,7 +106,7 @@ router.get("/fetch-product/:id", async (req, res) => {
 });
 
 // API for updating a product by ID (with optional image update)
-router.post("/update-product/:id", isAdmin, upload.fields([{ name: "coverPhoto" }, { name: "framePhoto" }]), async (req, res) => {
+router.post("/update-product/:id", upload.fields([{ name: "coverPhoto" }, { name: "framePhoto" }]), async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) {
@@ -164,7 +164,7 @@ router.post("/update-product/:id", isAdmin, upload.fields([{ name: "coverPhoto" 
 
 
 // API for deleting a product by ID
-router.get("/delete-product/:id", isAdmin, async (req, res) => {
+router.get("/delete-product/:id", async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) {
