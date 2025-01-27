@@ -76,7 +76,6 @@ router.get("/logout", isAuth, (req, res) => {
 // API for fetching session user (Check if logged in)
 router.get("/fetch-authuser", isAuth, (req, res) => {
     try{
-      console.log('session data:',req.session)
         if (req.session.user) {
             return res.send({ success: true, message: "Successfully fetched the current auth User!", user: req.session.user });
         } else {

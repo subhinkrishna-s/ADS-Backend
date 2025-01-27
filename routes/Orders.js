@@ -1,21 +1,41 @@
 const express = require("express");
 const router = express.Router();
 const Order = require("../models/Order");
+const multer = require("multer");
+const path = require("path");
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Save images in the 'uploads' folder
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Rename file with timestamp
+  }
+});
+
+const upload = multer({ storage });
 
 // API for placing a new order
-router.post("/place-order", async (req, res) => {
+router.post("/place-order", upload.single("image"), async (req, res) => {
   try {
-    const { customerName, email, contact, address, productId, size, quantity, totalAmount } = req.body;
+    console.log("order data:",req.body)
+
+    let { customerName, email, contact, address, productId, height, width, quantity, totalAmount } = req.body;
+    height=Number(height)
+    width=Number(width)
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null
     
-    if (!customerName || !email || !contact || !address || !productId || !size || !quantity || !totalAmount) {
+    if(!imageUrl){
+      return res.send({success: false, message: "Trouble in processing uploaded Image! please contact developer."})
+    }
+
+
+    if (!customerName || !email || !contact || !address || !productId || !height || !width || !quantity || !totalAmount) {
       return res.send({ success: false, message: "Please provide all details!" });
     }
 
-    if (!size || !size.height || !size.width) {
-        return res.send({ success: false, message: "Please provide size with both height and width!" });
-    }
-
-    if (typeof size.height !== 'number' || typeof size.width !== 'number') {
+    if (typeof height !== 'number' || typeof width !== 'number') {
         return res.send({ success: false, message: "Height and width should be numbers!" });
     }
     
@@ -25,7 +45,7 @@ router.post("/place-order", async (req, res) => {
         return res.send({ success: false, message: "Failed to generate ID, please contact developer!" });
     }
     
-    const newOrder = new Order({ id, customerName, email, contact, address, productId, size, quantity, totalAmount });
+    const newOrder = new Order({ id, customerName, email, contact, address, productId, size: {height: height, width: width}, quantity, totalAmount, image: imageUrl });
     await newOrder.save();
     
     return res.send({ success: true, message: "Order placed successfully" });

@@ -13,7 +13,8 @@ const orderSchema = new mongoose.Schema({
   },
   quantity: { type: Number, required: true },
   totalAmount: { type: Number, required: true },
-  status: { type: String, enum: ["Pending", "Processing", "Shipped", "Delivered"], default: "Pending" }
+  status: { type: String, enum: ["Pending", "Processing", "Shipped", "Delivered"], default: "Pending" },
+  image: {type: String, required: true} 
 });
 
 module.exports = mongoose.model("ADS-Orders", orderSchema);

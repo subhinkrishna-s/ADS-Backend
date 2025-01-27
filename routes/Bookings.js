@@ -62,10 +62,11 @@ router.get("/fetch-booking/:id", isAdmin, async (req, res) => {
 // API for updating the status of a booking by ID
 router.post("/update-booking/:id", isAdmin, async (req, res) => {
   try {
+
     const { id } = req.params;
     const { status } = req.body;
     
-    if (!id || !status) {
+    if (!id || !status || id === 'undefined') {
       return res.send({ success: false, message: "Please provide a valid ID and status!" });
     }
     
@@ -73,6 +74,7 @@ router.post("/update-booking/:id", isAdmin, async (req, res) => {
       { id },
       { $set: { status } }
     );
+
     if (!updatedBooking) {
       return res.send({ success: false, message: "Failed to update booking status!" });
     }

@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // API for adding a new service
-router.post("/add-service", upload.single("coverPhoto"), async (req, res) => {
+router.post("/add-service", isAdmin, upload.single("coverPhoto"), async (req, res) => {
   try {
     const { name, description, price, isAvailable } = req.body;
     const coverPhoto = req.file ? req.file.path : null;
@@ -70,7 +70,7 @@ router.get("/fetch-service/:id", async (req, res) => {
 });
 
 // API for updating a service by ID (with optional coverPhoto update)
-router.post("/update-service/:id", upload.single("coverPhoto"), async (req, res) => {
+router.post("/update-service/:id", isAdmin, upload.single("coverPhoto"), async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, price, isAvailable } = req.body;
@@ -96,7 +96,7 @@ router.post("/update-service/:id", upload.single("coverPhoto"), async (req, res)
 });
 
 // API for deleting a service by ID
-router.get("/delete-service/:id", async (req, res) => {
+router.get("/delete-service/:id", isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) {
