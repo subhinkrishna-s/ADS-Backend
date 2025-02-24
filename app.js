@@ -4,6 +4,8 @@ require('dotenv').config()
 const mongoose = require('mongoose')
 const Session = require('express-session')
 const MongoDbSession = require('connect-mongodb-session')(Session)
+const fs = require("fs");
+const path = require("path");
 
 const AuthRouter = require('./routes/Auth')
 const BookingRouter = require('./routes/Bookings')
@@ -27,7 +29,7 @@ mongoose.connect(MongoDbURI)
 app.use(Express.json())
 app.use(Express.urlencoded({extended: true}))
 app.use(cors({
-    origin: [`http://localhost:3000`, `https://asdstudio.vercel.app`, `http://192.168.0.110:3000`, `http://192.168.0.34:5500`, `http://192.168.0.31:3000`],
+    origin: [`http://localhost:3000`, `https://asdstudio.vercel.app`, `http://192.168.0.110:3000`, `http://192.168.0.110:3001`, `http://192.168.0.34:5500`, `http://192.168.0.31:3000`],
     credentials: true
 }))
 
@@ -56,11 +58,29 @@ app.use((req, res, next) => {
     next();
 });
 
-
-
 app.use(AuthRouter)
 app.use(BookingRouter)
 app.use(OrderRouter)
 app.use(ProductRouter)
 app.use(ServiceRouter)
 app.use(UsersRouter)
+
+app.get("/download/:filename", (req, res) => {
+    const filePath = path.join(__dirname, "uploads", req.params.filename);
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send("File not found");
+    }
+
+    // Force download with correct headers
+    res.setHeader("Content-Disposition", `attachment; filename="${req.params.filename}"`);
+    res.setHeader("Content-Type", "application/octet-stream");
+
+    res.download(filePath, (err) => {
+        if (err) {
+            console.error("Error downloading file:", err);
+            res.status(500).send("Error downloading file");
+        }
+    });
+});
