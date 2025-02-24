@@ -47,11 +47,11 @@ app.use(Session({
     saveUninitialized: false,
     resave: true,
     store: Store,
-    cookie: {
-        secure: true,
-        httpOnly: true,
-        sameSite: 'none'
-    }
+    // cookie: {
+    //     secure: true,
+    //     httpOnly: true,
+    //     sameSite: 'none'
+    // }
 }))
 
 app.use((req, res, next) => {
